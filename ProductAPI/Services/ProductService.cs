@@ -95,7 +95,6 @@ namespace ProductAPI.Services
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
             return _mapper.Map<ProductReadDto>(product);
-
         }
 
         public async Task<bool> DeleteAsync(string id)

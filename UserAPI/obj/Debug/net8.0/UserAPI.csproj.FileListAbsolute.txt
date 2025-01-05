@@ -143,3 +143,4 @@ D:\FullStack\selise\ecommerce-backend-with-dotnet-microservice\UserAPI\obj\Debug
 D:\FullStack\selise\ecommerce-backend-with-dotnet-microservice\UserAPI\obj\Debug\net8.0\UserAPI.pdb
 D:\FullStack\selise\ecommerce-backend-with-dotnet-microservice\UserAPI\obj\Debug\net8.0\UserAPI.genruntimeconfig.cache
 D:\FullStack\selise\ecommerce-backend-with-dotnet-microservice\UserAPI\obj\Debug\net8.0\ref\UserAPI.dll
+D:\FullStack\selise\ecommerce-backend-with-dotnet-microservice\UserAPI\obj\Debug\net8.0\UserAPI.sourcelink.json
