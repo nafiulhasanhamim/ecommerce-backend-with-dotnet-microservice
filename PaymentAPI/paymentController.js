@@ -13,14 +13,14 @@ class paymentController {
   };
 
   payment_create = async (req, res) => {
-    const { amount, userId } = req.body;
+    const { amount, userId, orderId } = req.body;
     globals.set("userId", userId);
     try {
       const { data } = await axios.post(
         process.env.bkash_create_payment_url,
         {
           mode: "0011",
-          payerReference: " ",
+          payerReference: orderId,
           callbackURL: "http://localhost:5000/api/bkash/payment/callback",
           amount: amount,
           currency: "BDT",
@@ -34,7 +34,7 @@ class paymentController {
       return res.status(200).json({ bkashURL: data.bkashURL });
     } catch (error) {
       return res.redirect(
-        `http://localhost:5173/error?message=${error.message}`
+        `http://localhost:4200/error?message=${error.message}`
       );
     }
   };
@@ -43,7 +43,7 @@ class paymentController {
     const { paymentID, status } = req.query;
     var Data = "";
     if (status === "cancel" || status === "failure") {
-      return res.redirect(`http://localhost:5173/error?message=${status}`);
+      return res.redirect(`http://localhost:4200/error?message=${status}`);
     }
     if (status === "success") {
       try {
@@ -54,19 +54,26 @@ class paymentController {
             headers: await this.bkash_headers(),
           }
         );
+        const orderId = data.payerReference;
+        let url = "http://localhost:5008/api/Order/payment";
+        const eventType = "payment_success";
+        const response = await axios.post(
+          url,
+          { orderId, eventType },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
         Data = data;
         if (data && data.statusCode === "0000") {
           return res.redirect(`http://localhost:4200/orders`);
         }
       } catch (error) {
         if (Data.statusMessage == "Successful")
-          return res.redirect(
-            `http://localhost:4200/orders`
-          );
-        else
-          return res.redirect(
-            `http://localhost:4200/orders`
-          );
+          return res.redirect(`http://localhost:4200/orders`);
+        else return res.redirect(`http://localhost:4200/orders`);
       }
     }
   };

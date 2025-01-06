@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ProductAPI.Controllers;
+using ProductAPI.DTO;
 using ProductAPI.DTOs;
 using ProductAPI.Interfaces;
 using ProductAPI.Services.Caching;
@@ -68,6 +69,26 @@ namespace Services.ProductAPI.Controllers
             else
             {
                 return ApiResponse.BadRequest("Product not found");
+            }
+        }
+        [HttpPost("process")]
+        public async Task<IActionResult> ProcessOrder([FromBody] List<OrderItemDTO> orderItems)
+        {
+            if (orderItems == null || !orderItems.Any())
+                return BadRequest("Invalid order items.");
+
+            try
+            {
+                var (orderDetails, totalOrderPrice) = await _productService.ProcessOrderAsync(orderItems);
+                return Ok(new
+                {
+                    OrderDetails = orderDetails,
+                    TotalOrderPrice = totalOrderPrice
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
             }
         }
     }

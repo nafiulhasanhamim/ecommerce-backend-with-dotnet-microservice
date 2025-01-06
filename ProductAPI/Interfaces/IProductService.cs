@@ -12,6 +12,6 @@ namespace ProductAPI.Interfaces
         Task<ProductReadDto> CreateAsync(ProductCreateDto productDto);
         Task<ProductReadDto> UpdateAsync(string id, ProductUpdateDto productDto);
         Task<bool> DeleteAsync(string id);
-        // Task<bool> UpdateStockAsync(OrderDTO eventMessage);
+        Task<(List<OrderResponseDto> OrderDetails, decimal TotalOrderPrice)> ProcessOrderAsync(List<OrderItemDTO> orderItems);
     }
 }

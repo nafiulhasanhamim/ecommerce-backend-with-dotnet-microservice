@@ -107,22 +107,48 @@ namespace ProductAPI.Services
             return true;
         }
 
-        // public async Task<bool> UpdateStockAsync(OrderDTO eventMessage)
-        // {
-        //     var product = await _context.Products.FirstOrDefaultAsync(p => p.ProductId == Guid.Parse(eventMessage.ProductId));
-        //     if (product == null) _messageBus.SendMessage(eventMessage, "stockFailed", "exchange");
-        //     else if (product.Quantity >= eventMessage.Quantity)
-        //     {
-        //         product.Quantity -= eventMessage.Quantity;
-        //         _context.Products.Update(product);
-        //         await _context.SaveChangesAsync();
-        //         _messageBus.SendMessage(eventMessage, "stockUpdated", "exchange");
-        //     }
-        //     else if (product.Quantity < eventMessage.Quantity)
-        //     {
-        //         _messageBus.SendMessage(eventMessage, "stockFailed", "exchange");
-        //     }
-        //     return true;
-        // }
+        public async Task<(List<OrderResponseDto> OrderDetails, decimal TotalOrderPrice)> ProcessOrderAsync(List<OrderItemDTO> orderItems)
+        {
+            var productIds = orderItems.Select(o => o.ProductId).ToList();
+
+            var products = await _context.Products
+                .Where(p => productIds.Contains(p.ProductId))
+                .ToListAsync();
+
+            if (products.Count != orderItems.Count)
+                throw new Exception("Some products do not exist or invalid product IDs provided.");
+
+            decimal totalOrderPrice = 0;
+            var orderResponses = new List<OrderResponseDto>();
+            foreach (var orderItem in orderItems)
+            {
+                var product = products.FirstOrDefault(p => p.ProductId == orderItem.ProductId);
+
+                if (product == null)
+                    throw new Exception($"Product with ID {orderItem.ProductId} does not exist.");
+
+                if (product.Quantity < orderItem.Quantity)
+                    throw new Exception($"Insufficient stock for product: {product.Name}");
+
+                product.Quantity -= orderItem.Quantity;
+
+                decimal effectivePrice = product.Price - product.Discount;
+                decimal totalItemPrice = effectivePrice * orderItem.Quantity;
+
+                totalOrderPrice += totalItemPrice;
+                orderResponses.Add(new OrderResponseDto
+                {
+                    ProductId = product.ProductId,
+                    Name = product.Name,
+                    Price = product.Price,
+                    Discount = product.Discount,
+                    OrderedQuantity = orderItem.Quantity,
+                    TotalItemPrice = totalItemPrice
+                });
+            }
+            _context.Products.UpdateRange(products);
+            await _context.SaveChangesAsync();
+            return (orderResponses, totalOrderPrice);
+        }
     }
 }
