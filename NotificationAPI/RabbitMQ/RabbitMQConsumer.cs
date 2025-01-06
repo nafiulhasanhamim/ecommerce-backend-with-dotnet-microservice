@@ -40,6 +40,32 @@ namespace NotificationAPI.RabbitMQ
             stoppingToken.ThrowIfCancellationRequested();
             var queueName = _channel.QueueDeclare().QueueName;
 
+            CreateConsumer("chatReceiverNotification", async (message) =>
+              {
+
+                  var eventMessage = JsonSerializer.Deserialize<ChatEventDto>(message);
+                  if (eventMessage == null)
+                  {
+                      return;
+                  }
+                  foreach (var userId in eventMessage.UserId!)
+                  {
+                      await _chatHubContext.Clients.Group($"user:{userId}").SendAsync("ChatReceiverMessage", eventMessage.Message);
+                  }
+              });
+
+            CreateConsumer("chatSenderNotification", async (message) =>
+            {
+                var eventMessage = JsonSerializer.Deserialize<ChatEventDto>(message);
+                if (eventMessage == null)
+                {
+                    return;
+                }
+                foreach (var userId in eventMessage.UserId!)
+                {
+                    await _chatHubContext.Clients.Group($"user:{userId}").SendAsync("ChatSenderMessage", eventMessage.Message);
+                }
+            });
 
             CreateConsumer("sentNotification", async (message) =>
             {
