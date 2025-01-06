@@ -51,8 +51,8 @@ namespace OrderAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] OrderCreateDto productDto)
         {
-            // var userId = User.GetUserId();
-            var order = await _orderService.CreateOrderAsync(productDto, "hhhh");
+            var userId = User.GetUserId();
+            var order = await _orderService.CreateOrderAsync(productDto, userId);
             return Ok(order);
         }
 
