@@ -1,9 +1,9 @@
-# 📦 **Microservice-Based E-commerce Application**
+#  **Microservice-Based E-commerce Application**
 
-## 🚀 **Overview**
-This project is a **Microservice-Based E-commerce Application** designed to handle a scalable, robust, and efficient online shopping platform. Each service is independently developed, deployed, and managed, ensuring flexibility, reliability, and maintainability.
+##  **Overview**
+This project is a **Microservice-Based E-commerce Application** designed to handle a scalable, robust, and efficient online shopping platform. Each service is independently developed.. ensuring flexibility, reliability, and maintainability.
 
-## 🛠️ **Technologies Used**
+##  **Technologies Used**
 - **Backend:** .NET Core, Node.js
 - **Real-Time Communication:** SignalR
 - **Reverse Proxy:** Gateway Service (YARP)
@@ -14,7 +14,7 @@ This project is a **Microservice-Based E-commerce Application** designed to hand
 
 ---
 
-## 📚 **Microservices Overview**
+##  **Microservices Overview**
 
 ### 1️⃣ **User Service**
 - **Features:**
