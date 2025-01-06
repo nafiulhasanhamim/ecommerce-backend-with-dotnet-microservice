@@ -19,13 +19,15 @@ namespace OrderAPI.Services
         private readonly IProductService _productService;
         private readonly ICouponService _couponService;
         private readonly IPaymentService _paymentService;
-        public OrderService(AppDbContext context, IMapper mapper, IProductService productService, ICouponService couponService, IPaymentService paymentService)
+        private readonly IRabbmitMQCartMessageSender _messageBus;
+        public OrderService(AppDbContext context, IMapper mapper, IProductService productService, ICouponService couponService, IPaymentService paymentService, IRabbmitMQCartMessageSender messageBus)
         {
             _context = context;
             _mapper = mapper;
             _productService = productService;
             _couponService = couponService;
             _paymentService = paymentService;
+            _messageBus = messageBus;
         }
 
         public async Task<IEnumerable<OrderReadDto>> GetAllOrdersAsync()
@@ -122,6 +124,8 @@ namespace OrderAPI.Services
             {
                 order.OrderConfirmationStatus = true;
                 _context.Orders.Update(order);
+                _messageBus.SendMessage(new { UserId = new List<string> { }, Entity = "order", EntityId = id, Title = "Orders", Message = "New Order is placed", Whom = "Admin" }, "sentNotification", "queue");
+
             }
             else if (eventType == "payment_failed")
             {
